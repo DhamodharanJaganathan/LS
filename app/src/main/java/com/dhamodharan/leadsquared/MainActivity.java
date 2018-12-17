@@ -129,19 +129,13 @@ public class MainActivity extends AppCompatActivity {
     }
     return super.onOptionsItemSelected(item);
   }
-  /**
-   * This synchronizes the drawer icon that rotates when the drawer is swiped left or right.
-   * Called inside onPostCreate so that it can synchronize the animation again when the Activity is restored.
-   */
+
   @Override
   protected void onPostCreate(Bundle savedInstanceState) {
     super.onPostCreate(savedInstanceState);
     drawerToggle.syncState();
   }
-  /**
-   * This is to handle generally orientation changes of your device. It is mandatory to include
-   * android:configChanges="keyboardHidden|orientation|screenSize" in your activity tag of the manifest for this to work.
-   */
+
   @Override
   public void onConfigurationChanged(Configuration newConfig) {
     super.onConfigurationChanged(newConfig);
