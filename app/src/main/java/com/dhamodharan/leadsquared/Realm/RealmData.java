@@ -4,10 +4,10 @@ import io.realm.RealmObject;
 
 public class RealmData extends RealmObject {
 
-    String source;
-    String title;
-    String content;
-    String imageurl;
+    private String source;
+    private String title;
+    private String content;
+    private String imageurl;
 
     public String getUrl() {
         return url;
@@ -17,7 +17,7 @@ public class RealmData extends RealmObject {
         this.url = url;
     }
 
-    String url;
+    private String url;
 
     public String getImageurl() {
         return imageurl;

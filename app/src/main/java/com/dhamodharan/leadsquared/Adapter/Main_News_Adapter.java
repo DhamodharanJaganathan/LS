@@ -9,7 +9,6 @@ import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.RecyclerView.Adapter;
 import android.view.LayoutInflater;
 import android.view.View;
-import android.view.View.OnClickListener;
 import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.TextView;
@@ -26,9 +25,8 @@ import java.util.List;
 
 public class Main_News_Adapter extends Adapter<ViewHolder> {
 
-  FragmentActivity fragmentActivity;
-  String Source = "Source: ";
-  private List<Article> android;
+  private final FragmentActivity fragmentActivity;
+  private final List<Article> android;
 
   public Main_News_Adapter(List<Article> android,
       FragmentActivity fragmentActivity) {
@@ -36,8 +34,9 @@ public class Main_News_Adapter extends Adapter<ViewHolder> {
     this.fragmentActivity = fragmentActivity;
   }
 
+  @NonNull
   @Override
-  public ViewHolder onCreateViewHolder(ViewGroup viewGroup, int i) {
+  public ViewHolder onCreateViewHolder(@NonNull ViewGroup viewGroup, int i) {
     View view = LayoutInflater.from(viewGroup.getContext())
         .inflate(R.layout.card_row, viewGroup, false);
     return new ViewHolder(view);
@@ -45,7 +44,8 @@ public class Main_News_Adapter extends Adapter<ViewHolder> {
 
   @Override
   public void onBindViewHolder(@NonNull ViewHolder viewHolder, int i) {
-    viewHolder.tvSource.setText(Source + android.get(i).getSource().getName());
+    String source = "Source: ";
+    viewHolder.tvSource.setText(source + android.get(i).getSource().getName());
     viewHolder.tvName.setText(android.get(i).getTitle());
     viewHolder.tvVersion.setText(android.get(i).getDescription());
     GlideApp.with(fragmentActivity)
@@ -55,57 +55,38 @@ public class Main_News_Adapter extends Adapter<ViewHolder> {
         .error(R.drawable.ic_warning_black_24dp)
         .into(viewHolder.imageView);
 
-    viewHolder.tvBookmark.setOnClickListener(new OnClickListener() {
-      @Override
-      public void onClick(View v) {
+    viewHolder.tvBookmark.setOnClickListener(v -> {
 
-        Realm realm = Realm.getDefaultInstance();
+      Realm realm = Realm.getDefaultInstance();
 
-        RealmData user = realm.where(RealmData.class).equalTo("title", android.get(i).getTitle())
-            .findFirst();
+      RealmData user = realm.where(RealmData.class).equalTo("title", android.get(i).getTitle())
+          .findFirst();
 
-        if (user != null) {
-          // Exists
-          Toast.makeText(fragmentActivity, "Already added to favorites", Toast.LENGTH_SHORT).show();
-        } else {
-          realm.beginTransaction();
-          RealmData realmData = realm.createObject(RealmData.class);
-          realmData.setTitle(android.get(i).getTitle());
-          realmData.setContent(android.get(i).getContent());
-          realmData.setSource(android.get(i).getSource().getName());
-          realmData.setImageurl(android.get(i).getUrlToImage());
-          realmData.setUrl(android.get(i).getUrl());
-          realm.commitTransaction();
-          // Not exist
-          Toast.makeText(fragmentActivity, "Added to favorites", Toast.LENGTH_SHORT).show();
-        }
-
-        /*RealmData realmData = realm.createObject(RealmData.class);
+      if (user != null) {
+        // Exists
+        Toast.makeText(fragmentActivity, "Already added to favorites", Toast.LENGTH_SHORT).show();
+      } else {
+        realm.beginTransaction();
+        RealmData realmData = realm.createObject(RealmData.class);
         realmData.setTitle(android.get(i).getTitle());
         realmData.setContent(android.get(i).getContent());
-        realmData.setContent(android.get(i).getSource().getName());
+        realmData.setSource(android.get(i).getSource().getName());
         realmData.setImageurl(android.get(i).getUrlToImage());
+        realmData.setUrl(android.get(i).getUrl());
         realm.commitTransaction();
-
-        RealmResults<RealmData> results = realm.where(RealmData.class).findAll();
-
-        for(RealmData realmData1 : results){
-          Toast.makeText(fragmentActivity, realmData1.getTitle(), Toast.LENGTH_SHORT).show();
-        }*/
-
-        viewHolder.cardView.setOnClickListener(new OnClickListener() {
-          @Override
-          public void onClick(View v) {
-
-            Intent i1 = new Intent(Intent.ACTION_VIEW);
-            i1.setData(Uri.parse(android.get(i).getUrl()));
-            fragmentActivity.startActivity(i1);
-
-          }
-        });
-
-
+        // Not exist
+        Toast.makeText(fragmentActivity, "Added to favorites", Toast.LENGTH_SHORT).show();
       }
+
+      viewHolder.cardView.setOnClickListener(v1 -> {
+
+        Intent i1 = new Intent(Intent.ACTION_VIEW);
+        i1.setData(Uri.parse(android.get(i).getUrl()));
+        fragmentActivity.startActivity(i1);
+
+      });
+
+
     });
   }
 
@@ -138,7 +119,3 @@ public class Main_News_Adapter extends Adapter<ViewHolder> {
     }
   }
 }
-
-//  https://www.thecrazyprogrammer.com/2016/12/android-realm-database-tutorial.html
-
-// android realm add data

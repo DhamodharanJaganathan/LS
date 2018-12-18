@@ -1,7 +1,7 @@
 package com.dhamodharan.leadsquared.Fragment;
 
-import android.app.Activity;
 import android.os.Bundle;
+import android.support.annotation.NonNull;
 import android.support.v4.app.Fragment;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
@@ -22,15 +22,12 @@ import java.util.List;
 
 public class Frag_Fav_News extends Fragment {
 
-  Realm realm;
   //a list to store all the products
-  List<Article> fav_list;
+  private List<Article> fav_list;
 
   //the recyclerview
-  RecyclerView recyclerView;
+  private RecyclerView recyclerView;
   //private DataAdapter_1 adapter;
-
-  private Main_Fav_Adapter mainFavAdapter;
 
   private void printLog(String s) {
 // display a message in Log File
@@ -44,7 +41,7 @@ public class Frag_Fav_News extends Fragment {
   }
 
   @Override
-  public View onCreateView(LayoutInflater inflater, ViewGroup container,
+  public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container,
       Bundle savedInstanceState) {
 
     View v = inflater.inflate(R.layout.fragment, container, false);
@@ -59,17 +56,12 @@ public class Frag_Fav_News extends Fragment {
   }
 
   @Override
-  public void onViewCreated(View view, Bundle savedInstanceState) {
+  public void onViewCreated(@NonNull View view, Bundle savedInstanceState) {
     super.onViewCreated(view, savedInstanceState);
     printLog("onViewCreated Called");
 
   }
 
-  @Override
-  public void onAttach(Activity activity) {
-    super.onAttach(activity);
-    printLog("onAttach Called");
-  }
 
   @Override
   public void onCreate(Bundle savedInstanceState) {
@@ -120,9 +112,9 @@ public class Frag_Fav_News extends Fragment {
   }
 
 
-  public void updateListView() {
+  private void updateListView() {
 
-    realm = Realm.getDefaultInstance();
+    Realm realm = Realm.getDefaultInstance();
 
     RealmResults<RealmData> results = realm.where(RealmData.class).findAll();
 
@@ -139,7 +131,7 @@ public class Frag_Fav_News extends Fragment {
     recyclerView.setAdapter(adapter);*/
     Collections.reverse(fav_list);
 
-    mainFavAdapter = new Main_Fav_Adapter(fav_list, getActivity());
+    Main_Fav_Adapter mainFavAdapter = new Main_Fav_Adapter(fav_list, getActivity());
     recyclerView.setAdapter(mainFavAdapter);
     mainFavAdapter.notifyDataSetChanged();
   }
@@ -152,7 +144,6 @@ public class Frag_Fav_News extends Fragment {
       if(fav_list.size() != 0) {
         Toast.makeText(getActivity(), "Long press to delete bookmark", Toast.LENGTH_SHORT).show();
       }
-    } else {
     }
   }
 

@@ -36,6 +36,7 @@ import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
 import com.nabinbhandari.android.permissions.PermissionHandler;
 import com.nabinbhandari.android.permissions.Permissions;
+import java.util.Objects;
 import java.util.Timer;
 import java.util.TimerTask;
 import retrofit2.Call;
@@ -53,22 +54,20 @@ public class Frag_Mapview extends Fragment implements
     GoogleApiClient.OnConnectionFailedListener,
     LocationListener {
 
-  protected LatLng latLng;
-  GoogleApiClient mGoogleApiClient;
-  LocationRequest mLocationRequest;
-  Location mLastLocation;
-  Marker mCurrLocationMarker;
+  private LatLng latLng;
+  private GoogleApiClient mGoogleApiClient;
   private GoogleMap mMap;
 
   @Nullable
   @Override
-  public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container,
+  public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container,
       @Nullable Bundle savedInstanceState) {
     View rootView = inflater.inflate(
         R.layout.map_fragment, container, false);
     SupportMapFragment mapFragment =
         (SupportMapFragment) getChildFragmentManager().findFragmentById(R.id.map);
-    mapFragment.getMapAsync(this);
+    Objects.requireNonNull(mapFragment).getMapAsync(this);
+    Toast.makeText(getActivity(), "Turn ON location", Toast.LENGTH_SHORT).show();
     return rootView;
   }
 
@@ -84,7 +83,8 @@ public class Frag_Mapview extends Fragment implements
 
 
   private void enableMyLocation() {
-    if (ContextCompat.checkSelfPermission(getActivity(), Manifest.permission.ACCESS_FINE_LOCATION)
+    if (ContextCompat.checkSelfPermission(Objects.requireNonNull(getActivity()),
+        Manifest.permission.ACCESS_FINE_LOCATION)
         != PackageManager.PERMISSION_GRANTED) {
       permission_check();
 
@@ -138,7 +138,7 @@ public class Frag_Mapview extends Fragment implements
     Call<Model_WH> call = request.getJSON_WH();
     call.enqueue(new Callback<Model_WH>() {
       @Override
-      public void onResponse(Call<Model_WH> call, Response<Model_WH> response) {
+      public void onResponse(@NonNull Call<Model_WH> call, @NonNull Response<Model_WH> response) {
 
         Model_WH jsonResponse = response.body();
 
@@ -146,7 +146,7 @@ public class Frag_Mapview extends Fragment implements
         Marker Bangalore_1 = mMap.addMarker(new MarkerOptions()
             .position(latLng)
             .icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_VIOLET))
-            .snippet("Climate: " + jsonResponse.getList().get(1).getMain().getTemp() + " Celicus")
+            .snippet("Climate: " + Objects.requireNonNull(jsonResponse).getList().get(1).getMain()+ " Celicus")
             .title("you"));
         Bangalore_1.showInfoWindow();
 
@@ -193,27 +193,23 @@ public class Frag_Mapview extends Fragment implements
       }
 
       @Override
-      public void onFailure(Call<Model_WH> call, Throwable t) {
+      public void onFailure(@NonNull Call<Model_WH> call, @NonNull Throwable t) {
         Log.d("Error", t.getMessage());
       }
     });
   }
 
 
-  public void startTimer(GoogleMap mMap) {
+  private void startTimer(GoogleMap mMap) {
     Timer timer = new Timer();
     TimerTask timerTask = new TimerTask() {
 
       @Override
       public void run() {
         if (getActivity() != null) {
-          getActivity().runOnUiThread(new Runnable() {
-
-            @Override
-            public void run() {
-              loadJSON(mMap);
-              Log.d("TAG", "run: " + "MAP RELOADED");
-            }
+          getActivity().runOnUiThread(() -> {
+            loadJSON(mMap);
+            Log.d("TAG", "run: " + "MAP RELOADED");
           });
         }
       }
@@ -222,8 +218,8 @@ public class Frag_Mapview extends Fragment implements
   }
 
 
-  protected synchronized void buildGoogleApiClient() {
-    mGoogleApiClient = new GoogleApiClient.Builder(getActivity())
+  private synchronized void buildGoogleApiClient() {
+    mGoogleApiClient = new GoogleApiClient.Builder(Objects.requireNonNull(getActivity()))
         .addConnectionCallbacks(this)
         .addOnConnectionFailedListener(this)
         .addApi(LocationServices.API)
@@ -233,15 +229,15 @@ public class Frag_Mapview extends Fragment implements
 
   @Override
   public void onConnected(Bundle bundle) {
-    mLocationRequest = new LocationRequest();
+    LocationRequest mLocationRequest = new LocationRequest();
     mLocationRequest.setInterval(1000);
     mLocationRequest.setFastestInterval(1000);
     mLocationRequest.setPriority(LocationRequest.PRIORITY_BALANCED_POWER_ACCURACY);
-    if (ContextCompat.checkSelfPermission(getActivity(),
+    if (ContextCompat.checkSelfPermission(Objects.requireNonNull(getActivity()),
         Manifest.permission.ACCESS_FINE_LOCATION)
         == PackageManager.PERMISSION_GRANTED) {
       LocationServices.FusedLocationApi
-          .requestLocationUpdates(mGoogleApiClient, mLocationRequest, (LocationListener) this);
+          .requestLocationUpdates(mGoogleApiClient, mLocationRequest, this);
     }
   }
 
@@ -250,16 +246,11 @@ public class Frag_Mapview extends Fragment implements
   }
 
   @Override
-  public void onConnectionFailed(ConnectionResult connectionResult) {
+  public void onConnectionFailed(@NonNull ConnectionResult connectionResult) {
   }
 
   @Override
   public void onLocationChanged(Location location) {
-    mLastLocation = location;
-    if (mCurrLocationMarker != null) {
-      mCurrLocationMarker.remove();
-    }
-
     //Place current location marker
     latLng = new LatLng(location.getLatitude(), location.getLongitude());
     loadJSON(mMap);

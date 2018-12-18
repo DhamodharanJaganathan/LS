@@ -1,6 +1,5 @@
 package com.dhamodharan.leadsquared;
 
-import android.content.Intent;
 import android.content.res.Configuration;
 import android.support.design.widget.NavigationView;
 import android.support.v4.app.Fragment;
@@ -52,10 +51,10 @@ public class MainActivity extends AppCompatActivity {
 
   }
 
-  void initializeStuff(){
-    drawerLayout =(DrawerLayout) findViewById(R.id.drawerLayout);
-    toolbar = (Toolbar) findViewById(R.id.toolbar);
-    navigationView = (NavigationView) findViewById(R.id.navigationDrawer);
+  private void initializeStuff(){
+    drawerLayout = findViewById(R.id.drawerLayout);
+    toolbar = findViewById(R.id.toolbar);
+    navigationView = findViewById(R.id.navigationDrawer);
   }
 
   /**
@@ -63,27 +62,24 @@ public class MainActivity extends AppCompatActivity {
    */
   private void setUpNavigationView(final NavigationView navigationView) {
     navigationView.setNavigationItemSelectedListener(
-        new NavigationView.OnNavigationItemSelectedListener() {
-          @Override
-          public boolean onNavigationItemSelected(MenuItem menuItem) {
-            //replace the current fragment with the new fragment.
-            Fragment selectedFragment = selectDrawerItem(menuItem);
-            FragmentManager fragmentManager = getSupportFragmentManager();
-            fragmentManager.beginTransaction().replace(R.id.frameContent, selectedFragment).commit();
-            // the current menu item is highlighted in navigation tray.
-            navigationView.setCheckedItem(menuItem.getItemId());
-            setTitle(menuItem.getTitle());
-            //close the drawer when user selects a nav item.
-            drawerLayout.closeDrawers();
-            return true;
-          }
+        menuItem -> {
+          //replace the current fragment with the new fragment.
+          Fragment selectedFragment = selectDrawerItem(menuItem);
+          FragmentManager fragmentManager = getSupportFragmentManager();
+          fragmentManager.beginTransaction().replace(R.id.frameContent, selectedFragment).commit();
+          // the current menu item is highlighted in navigation tray.
+          navigationView.setCheckedItem(menuItem.getItemId());
+          setTitle(menuItem.getTitle());
+          //close the drawer when user selects a nav item.
+          drawerLayout.closeDrawers();
+          return true;
         });
   }
 
   /**
    * This method returns the fragment according to navigation item selected.
    */
-  public Fragment selectDrawerItem(MenuItem menuItem){
+  private Fragment selectDrawerItem(MenuItem menuItem){
     Fragment fragment = null;
     switch(menuItem.getItemId()) {
       case R.id.nav_india:

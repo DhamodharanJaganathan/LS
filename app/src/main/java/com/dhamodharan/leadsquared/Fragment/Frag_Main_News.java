@@ -2,8 +2,8 @@ package com.dhamodharan.leadsquared.Fragment;
 
 
 import android.os.Bundle;
+import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
-import android.support.design.widget.Snackbar;
 import android.support.v4.app.Fragment;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
@@ -18,6 +18,7 @@ import com.dhamodharan.leadsquared.Networking.RequestInterface;
 import com.dhamodharan.leadsquared.R;
 import com.dhamodharan.leadsquared.Utils.Demo_point;
 import com.dhamodharan.leadsquared.Utils.InternetConnectionChecker;
+import java.util.Objects;
 import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
@@ -33,7 +34,7 @@ Frag_Main_News extends Fragment {
 
   @Nullable
   @Override
-  public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container,
+  public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container,
       @Nullable Bundle savedInstanceState) {
     View rootView = inflater.inflate(
         R.layout.fragment, container, false);
@@ -42,12 +43,12 @@ Frag_Main_News extends Fragment {
   }
 
   private void initViews(View rootView) {
-    recyclerView = (RecyclerView) rootView.findViewById(R.id.card_recycler_view);
+    recyclerView = rootView.findViewById(R.id.card_recycler_view);
     recyclerView.setHasFixedSize(true);
     RecyclerView.LayoutManager layoutManager = new LinearLayoutManager(rootView
         .getContext());
     recyclerView.setLayoutManager(layoutManager);
-    if (InternetConnectionChecker.getInstance(getActivity()).isOnline()) {
+    if (InternetConnectionChecker.getInstance(Objects.requireNonNull(getActivity())).isOnline()) {
       Toast.makeText(getActivity(), "Loading", Toast.LENGTH_SHORT).show();
       loadJSON();
     } else {
@@ -67,14 +68,14 @@ Frag_Main_News extends Fragment {
             + "&apiKey=f20c7f924a5f4b1384407a0105013d92");
     call.enqueue(new Callback<ModelVM>() {
       @Override
-      public void onResponse(Call<ModelVM> call, Response<ModelVM> response) {
+      public void onResponse(@NonNull Call<ModelVM> call, @NonNull Response<ModelVM> response) {
         ModelVM jsonResponse = response.body();
-        adapter = new Main_News_Adapter(jsonResponse.getArticles(), getActivity());
+        adapter = new Main_News_Adapter(Objects.requireNonNull(jsonResponse).getArticles(), getActivity());
         recyclerView.setAdapter(adapter);
       }
 
       @Override
-      public void onFailure(Call<ModelVM> call, Throwable t) {
+      public void onFailure(@NonNull Call<ModelVM> call, @NonNull Throwable t) {
         Log.d("Error", t.getMessage());
       }
     });

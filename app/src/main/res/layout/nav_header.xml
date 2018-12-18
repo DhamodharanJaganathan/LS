@@ -13,7 +13,7 @@
     android:layout_marginBottom="20dp"
     android:scaleType="centerCrop"
     android:src="@mipmap/ic_launcher_round"
-    />
+    android:contentDescription="TODO"/>
 
   <TextView
     android:textStyle="bold"

@@ -9,7 +9,6 @@ import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.RecyclerView.Adapter;
 import android.view.LayoutInflater;
 import android.view.View;
-import android.view.View.OnLongClickListener;
 import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.TextView;
@@ -27,8 +26,8 @@ import java.util.List;
 
 public class Main_Fav_Adapter extends Adapter<ViewHolder> {
 
-  List<Article> fav_list;
-  FragmentActivity activity;
+  private final List<Article> fav_list;
+  private final FragmentActivity activity;
 
   public Main_Fav_Adapter(List<Article> fav_list, FragmentActivity activity) {
     this.fav_list = fav_list;
@@ -58,40 +57,31 @@ public class Main_Fav_Adapter extends Adapter<ViewHolder> {
         .error(R.drawable.ic_warning_black_24dp)
         .into(viewHolder.imageView);
 
-    viewHolder.cardView.setOnClickListener(new View.OnClickListener() {
-      @Override
-      public void onClick(View v) {
+    viewHolder.cardView.setOnClickListener(v -> {
 
-        Intent i1 = new Intent(Intent.ACTION_VIEW);
-        i1.setData(Uri.parse(fav_list.get(i).getUrl()));
-        activity.startActivity(i1);
+      Intent i1 = new Intent(Intent.ACTION_VIEW);
+      i1.setData(Uri.parse(fav_list.get(i).getUrl()));
+      activity.startActivity(i1);
 
-      }
     });
 
 
-    viewHolder.cardView.setOnLongClickListener(new OnLongClickListener() {
-      @Override
-      public boolean onLongClick(View v) {
+    viewHolder.cardView.setOnLongClickListener(v -> {
 
-        Realm realm = Realm.getDefaultInstance();
+      Realm realm = Realm.getDefaultInstance();
 
-        realm.executeTransaction(new Realm.Transaction() {
-          @Override
-          public void execute(Realm realm) {
+      realm.executeTransaction(realm1 -> {
 
-            RealmResults<RealmData> rows = realm.where(RealmData.class)
-                .equalTo("title", fav_list.get(i)
-                    .getTitle())
-                .findAll();
-            rows.deleteAllFromRealm();
-            removeAt(i);
-            Toast.makeText(activity, "Removed", Toast.LENGTH_SHORT).show();
-          }
-        });
+        RealmResults<RealmData> rows = realm1.where(RealmData.class)
+            .equalTo("title", fav_list.get(i)
+                .getTitle())
+            .findAll();
+        rows.deleteAllFromRealm();
+        removeAt(i);
+        Toast.makeText(activity, "Removed", Toast.LENGTH_SHORT).show();
+      });
 
-        return true;
-      }
+      return true;
     });
 
   }
@@ -126,7 +116,7 @@ public class Main_Fav_Adapter extends Adapter<ViewHolder> {
   }
 
 
-  public void removeAt(int position) {
+  private void removeAt(int position) {
     fav_list.remove(position);
     notifyItemRemoved(position);
     notifyItemRangeChanged(position, fav_list.size());
