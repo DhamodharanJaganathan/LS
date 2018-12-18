@@ -138,7 +138,7 @@ public class Frag_Mapview extends Fragment implements
     Call<Model_WH> call = request.getJSON_WH();
     call.enqueue(new Callback<Model_WH>() {
       @Override
-      public void onResponse(@NonNull Call<Model_WH> call, @NonNull Response<Model_WH> response) {
+      public void onResponse(Call<Model_WH> call, Response<Model_WH> response) {
 
         Model_WH jsonResponse = response.body();
 
@@ -146,7 +146,7 @@ public class Frag_Mapview extends Fragment implements
         Marker Bangalore_1 = mMap.addMarker(new MarkerOptions()
             .position(latLng)
             .icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_VIOLET))
-            .snippet("Climate: " + Objects.requireNonNull(jsonResponse).getList().get(1).getMain()+ " Celicus")
+            .snippet("Climate: " + jsonResponse.getList().get(1).getMain().getTemp() + " Celicus")
             .title("you"));
         Bangalore_1.showInfoWindow();
 
@@ -258,4 +258,4 @@ public class Frag_Mapview extends Fragment implements
   }
 
 
-}// open weather api  infodhamo@gmail.com   9788263792
+}
